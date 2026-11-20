@@ -1,6 +1,4 @@
-use std::collections::LinkedList;
 use serenity::all::Context;
+use std::collections::LinkedList;
 
-pub fn run(args: LinkedList<&str>, ctx: Context) {
-    
-}
+pub fn run(args: LinkedList<&str>, ctx: Context) {}
