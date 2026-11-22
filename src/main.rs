@@ -1,10 +1,7 @@
-#![feature(linked_list_remove)]
-
 mod commands;
 mod misc;
 
 use crate::commands::run_command;
-use crate::misc::fetch_args;
 use env_file_reader::read_file;
 use serenity::all::{Context, EventHandler, GatewayIntents, Message};
 use serenity::{Client, async_trait};
@@ -14,8 +11,11 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, message: Message) {
-        let args = fetch_args(&message);
-        run_command(message.clone(), args, ctx).await;
+        if message.clone().content.into_chars().next() == Some('!') {
+            if !message.author.bot {
+                run_command(message.clone(), ctx).await;
+            }
+        }
     }
 }
 

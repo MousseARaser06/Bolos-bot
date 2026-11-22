@@ -1,34 +1,21 @@
 use serenity::all::{Context, Message};
-use std::collections::LinkedList;
+use crate::misc::{fetch_args, fetch_command};
 
 mod soundboard;
 
-pub enum Commands {
-    Soundboard(),
-}
+pub async fn run_command(message: Message, ctx: Context) {
+    let args = fetch_args(&message);
+    let command = fetch_command(args.clone());
 
-pub async fn parse_command(message: Message, ctx: &Context) -> Option<Commands> {
-    let command = message.content.clone();
-    match command.as_str() {
-        "soundboard" => Some(Commands::Soundboard()),
-        _ => {
-            if let Err(err) = message
-                .channel_id
-                .say(&ctx.http, format!("Commande {} introuvable", command))
-                .await
-            {
-                println!("Error sending message: {:?}", err);
-            };
-            None
-        }
-    }
-}
-
-pub async fn run_command(message: Message, args: LinkedList<&str>, ctx: Context) {
-    let command = parse_command(message, &ctx).await.unwrap();
+    println!("command : {:?}", command);
+    println!("args : {:?}", args);
     match command {
-        Commands::Soundboard() => {
-            soundboard::run(args, ctx);
+        Some("soundboard") => {
+            soundboard::run(&message, args, ctx).await;
+        }
+        None | Some("help") => {   message.channel_id.say(&ctx.http, "Help message").await.unwrap(); }
+        _ => {
+            message.channel_id.say(&ctx.http, "Commande invalide").await.unwrap();
         }
     }
 }
